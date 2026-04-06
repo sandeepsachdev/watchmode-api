@@ -4,6 +4,7 @@ server:
 watchmode:
   api:
     base-url: https://api.watchmode.com/v1
+    key: ${apikey}
 
 springdoc:
   swagger-ui:
