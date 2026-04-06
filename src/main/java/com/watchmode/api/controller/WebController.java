@@ -162,6 +162,7 @@ public class WebController {
     public String releases(
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Integer sourceId,
             Model model) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
         if (startDate == null || startDate.isBlank()) {
@@ -172,15 +173,23 @@ public class WebController {
         }
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        model.addAttribute("selectedSourceId", sourceId);
+        try {
+            List<Source> sources = service.getSources(null, null).block();
+            model.addAttribute("sources", sources != null ? sources : List.of());
+        } catch (Exception e) {
+            model.addAttribute("sources", List.of());
+        }
         try {
             ReleasesResponse releases = service.getReleases(startDate, endDate, 100).block();
             if (releases != null && releases.releases() != null) {
-                List<Release> sorted = releases.releases().stream()
+                List<Release> filtered = releases.releases().stream()
+                        .filter(r -> sourceId == null || r.sourceId() == sourceId)
                         .sorted(Comparator.comparing(
                                 Release::sourceReleaseDate,
                                 Comparator.nullsLast(Comparator.reverseOrder())))
                         .toList();
-                releases = new ReleasesResponse(sorted);
+                releases = new ReleasesResponse(filtered);
             }
             model.addAttribute("releases", releases);
         } catch (Exception e) {
