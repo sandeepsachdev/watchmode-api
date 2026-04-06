@@ -18,7 +18,7 @@
     <description>Spring Boot application for the Watchmode streaming data API</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
