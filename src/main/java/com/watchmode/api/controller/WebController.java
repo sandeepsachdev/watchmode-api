@@ -7,6 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -160,10 +163,25 @@ public class WebController {
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
             Model model) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+        if (startDate == null || startDate.isBlank()) {
+            startDate = LocalDate.now().minusDays(30).format(fmt);
+        }
+        if (endDate == null || endDate.isBlank()) {
+            endDate = LocalDate.now().minusDays(1).format(fmt);
+        }
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         try {
             ReleasesResponse releases = service.getReleases(startDate, endDate, 100).block();
+            if (releases != null && releases.releases() != null) {
+                List<Release> sorted = releases.releases().stream()
+                        .sorted(Comparator.comparing(
+                                Release::sourceReleaseDate,
+                                Comparator.nullsLast(Comparator.reverseOrder())))
+                        .toList();
+                releases = new ReleasesResponse(sorted);
+            }
             model.addAttribute("releases", releases);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());

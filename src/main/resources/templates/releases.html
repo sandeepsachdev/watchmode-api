@@ -10,17 +10,19 @@
     <h2 class="fw-bold mb-3">New &amp; Upcoming Releases</h2>
 
     <!-- Date filter -->
-    <form th:action="@{/releases}" method="get" class="filter-bar mb-4">
+    <form id="dateFilterForm" th:action="@{/releases}" method="get" class="filter-bar mb-4">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
-                <label class="form-label small text-secondary">From (YYYYMMDD)</label>
-                <input class="form-control form-control-sm" type="text" name="startDate"
-                       th:value="${startDate}" placeholder="e.g. 20240101"/>
+                <label class="form-label small text-secondary">From</label>
+                <input class="form-control form-control-sm" type="date" id="startDatePicker"
+                       th:data-value="${startDate}"/>
+                <input type="hidden" name="startDate" id="startDateHidden" th:value="${startDate}"/>
             </div>
             <div class="col-md-3">
-                <label class="form-label small text-secondary">To (YYYYMMDD)</label>
-                <input class="form-control form-control-sm" type="text" name="endDate"
-                       th:value="${endDate}" placeholder="e.g. 20240131"/>
+                <label class="form-label small text-secondary">To</label>
+                <input class="form-control form-control-sm" type="date" id="endDatePicker"
+                       th:data-value="${endDate}"/>
+                <input type="hidden" name="endDate" id="endDateHidden" th:value="${endDate}"/>
             </div>
             <div class="col-auto">
                 <button class="btn btn-danger btn-sm" type="submit">Apply</button>
@@ -28,6 +30,25 @@
             </div>
         </div>
     </form>
+    <script>
+        (function () {
+            function toISO(yyyymmdd) {
+                if (!yyyymmdd || yyyymmdd.length < 8) return '';
+                return yyyymmdd.slice(0, 4) + '-' + yyyymmdd.slice(4, 6) + '-' + yyyymmdd.slice(6, 8);
+            }
+            function fromISO(isoDate) {
+                return isoDate ? isoDate.replace(/-/g, '') : '';
+            }
+            var startPicker = document.getElementById('startDatePicker');
+            var endPicker = document.getElementById('endDatePicker');
+            startPicker.value = toISO(startPicker.dataset.value);
+            endPicker.value = toISO(endPicker.dataset.value);
+            document.getElementById('dateFilterForm').addEventListener('submit', function () {
+                document.getElementById('startDateHidden').value = fromISO(startPicker.value);
+                document.getElementById('endDateHidden').value = fromISO(endPicker.value);
+            });
+        })();
+    </script>
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
