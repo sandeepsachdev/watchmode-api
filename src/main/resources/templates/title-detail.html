@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head(${title?.title ?: 'Title'})}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main>
+    <!-- Error -->
+    <div th:if="${error}" class="container py-5">
+        <div class="alert alert-danger" th:text="${error}"></div>
+    </div>
+
+    <div th:if="${title != null}">
+        <!-- Backdrop / hero -->
+        <div class="position-relative" style="background:#0d0d0d;">
+            <div th:if="${title.backdrop}"
+                 style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:.25;"
+                 th:style="'position:absolute;inset:0;background-image:url(' + ${title.backdrop} + ');background-size:cover;background-position:center;opacity:.25;'"></div>
+            <div class="container py-5 position-relative">
+                <div class="row g-4">
+                    <!-- Poster -->
+                    <div class="col-auto">
+                        <img th:if="${title.poster}" th:src="${title.poster}" th:alt="${title.title}"
+                             class="rounded shadow" style="width:180px;"/>
+                        <div th:unless="${title.poster}"
+                             class="rounded shadow d-flex align-items-center justify-content-center"
+                             style="width:180px;height:270px;background:#2a2a2a;font-size:4rem;color:#444;">
+                            <i class="bi bi-film"></i>
+                        </div>
+                    </div>
+                    <!-- Info -->
+                    <div class="col">
+                        <h1 class="fw-bold mb-1" th:text="${title.title}">Title</h1>
+                        <div class="text-secondary mb-3">
+                            <span th:if="${title.year}" th:text="${title.year}"></span>
+                            <span th:if="${title.endYear}" th:text="'–' + ${title.endYear}"></span>
+                            <span th:if="${title.runtimeMinutes}" class="ms-2"
+                                  th:text="${title.runtimeMinutes} + ' min'"></span>
+                            <span class="ms-2 text-capitalize"
+                                  th:text="${title.type?.replace('_',' ')}"></span>
+                            <span th:if="${title.usRating}" class="ms-2 border border-secondary rounded px-1 small"
+                                  th:text="${title.usRating}"></span>
+                        </div>
+
+                        <!-- Ratings -->
+                        <div class="d-flex gap-3 mb-3 align-items-start">
+                            <div th:if="${title.userRating != null}" class="text-center">
+                                <div class="imdb-badge">
+                                    <span class="imdb-label">IMDb</span>
+                                    <span class="imdb-score" th:text="${#numbers.formatDecimal(title.userRating, 1, 1)}"></span>
+                                    <span class="imdb-max">/10</span>
+                                </div>
+                            </div>
+                            <div th:if="${title.criticScore != null}" class="text-center">
+                                <span class="rating-pill" style="background:#0d6efd;">
+                                    <i class="bi bi-award-fill me-1"></i>
+                                    <span th:text="${title.criticScore}"></span><span class="opacity-75">/100</span>
+                                </span>
+                                <div class="small text-secondary mt-1">Critic Score</div>
+                            </div>
+                        </div>
+
+                        <!-- Genres -->
+                        <div th:if="${title.genreNames != null}" class="mb-3">
+                            <span th:each="g : ${title.genreNames}"
+                                  class="badge bg-secondary me-1" th:text="${g}"></span>
+                        </div>
+
+                        <!-- Networks -->
+                        <div th:if="${title.networkNames != null and !title.networkNames.isEmpty()}" class="text-secondary small mb-2">
+                            <i class="bi bi-broadcast me-1"></i>
+                            <span th:each="n,i : ${title.networkNames}">
+                                <span th:text="${n}"></span><span th:if="${!i.last}">, </span>
+                            </span>
+                        </div>
+
+                        <!-- External links -->
+                        <div class="d-flex gap-2 mt-2">
+                            <a th:if="${title.imdbId}"
+                               th:href="'https://www.imdb.com/title/' + ${title.imdbId}"
+                               target="_blank" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-film me-1"></i>IMDb
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container py-4">
+            <div class="row g-4">
+                <div class="col-lg-8">
+
+                    <!-- Plot -->
+                    <div th:if="${title.plotOverview}" class="mb-4">
+                        <span class="section-title">Overview</span>
+                        <p class="mt-2 text-secondary" th:text="${title.plotOverview}"></p>
+                    </div>
+
+                    <!-- Where to Watch -->
+                    <div th:if="${title.sources != null and !title.sources.isEmpty()}" class="mb-4">
+                        <span class="section-title">Where to Watch</span>
+                        <div class="mt-2">
+                            <div th:each="src : ${title.sources}">
+                                <a th:href="${src.webUrl}" target="_blank" class="text-decoration-none"
+                                   th:classappend="'source-badge type-' + ${src.type}">
+                                    <i class="bi bi-play-circle me-1"></i>
+                                    <span th:text="${src.name}"></span>
+                                    <span class="ms-1 opacity-75 text-capitalize"
+                                          th:text="'(' + ${src.type} + ')'"></span>
+                                    <span th:if="${src.price != null and src.price > 0}"
+                                          th:text="' $' + ${src.price}"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seasons -->
+                    <div th:if="${title.seasons != null and !title.seasons.isEmpty()}" class="mb-4">
+                        <span class="section-title">Seasons</span>
+                        <div class="row row-cols-2 row-cols-sm-4 row-cols-md-6 g-2 mt-1">
+                            <div class="col" th:each="s : ${title.seasons}">
+                                <div class="bg-card p-2 text-center rounded">
+                                    <img th:if="${s.posterUrl}" th:src="${s.posterUrl}"
+                                         class="img-fluid rounded mb-1" th:alt="${s.name}" loading="lazy"/>
+                                    <div class="small fw-semibold" th:text="${s.name ?: 'Season ' + s.number}"></div>
+                                    <div class="small text-secondary" th:text="${s.episodeCount} + ' eps'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cast -->
+                    <div th:if="${title.cast != null and !title.cast.isEmpty()}" class="mb-4">
+                        <span class="section-title">Cast &amp; Crew</span>
+                        <div class="row row-cols-3 row-cols-sm-4 row-cols-md-6 g-2 mt-1">
+                            <div class="col" th:each="c : ${title.cast}" th:if="${c.type == 'Cast'}">
+                                <a th:href="@{/people/{id}(id=${c.personId})}"
+                                   class="text-decoration-none text-inherit d-block cast-card">
+                                    <th:block th:with="headshot=${headshotMap != null ? headshotMap[c.personId] : null}">
+                                        <img th:if="${headshot != null and !headshot.isEmpty()}"
+                                             th:src="${headshot}" th:alt="${c.fullName}" loading="lazy"/>
+                                        <div th:unless="${headshot != null and !headshot.isEmpty()}"
+                                             style="width:64px;height:64px;border-radius:50%;background:#2a2a2a;margin:0 auto .4rem;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#666;">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    </th:block>
+                                    <div class="fw-semibold" th:text="${c.fullName}"></div>
+                                    <div class="text-secondary" th:text="${c.role}"></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <div class="bg-card p-3">
+                        <h6 class="text-accent mb-3">Details</h6>
+                        <dl class="row small mb-0">
+                            <dt class="col-5 text-secondary">Original Language</dt>
+                            <dd class="col-7" th:text="${title.originalLanguage?.toUpperCase()}"></dd>
+
+                            <dt class="col-5 text-secondary" th:if="${title.imdbId}">IMDb</dt>
+                            <dd class="col-7" th:if="${title.imdbId}" th:text="${title.imdbId}"></dd>
+
+                            <dt class="col-5 text-secondary" th:if="${title.tmdbId}">TMDB ID</dt>
+                            <dd class="col-7" th:if="${title.tmdbId}" th:text="${title.tmdbId}"></dd>
+
+                            <dt class="col-5 text-secondary" th:if="${title.releaseDate}">Release Date</dt>
+                            <dd class="col-7" th:if="${title.releaseDate}" th:text="${title.releaseDate}"></dd>
+                        </dl>
+                    </div>
+
+                    <!-- Similar Titles -->
+                    <div th:if="${title.similarTitles != null and !title.similarTitles.isEmpty()}" class="bg-card p-3 mt-3">
+                        <h6 class="text-accent mb-2">Similar Titles</h6>
+                        <div th:each="sid, iter : ${title.similarTitles}" th:if="${iter.index < 8}">
+                            <a th:href="@{/titles/{id}(id=${sid})}" class="d-block text-secondary small py-1 text-decoration-none hover-text-light">
+                                <i class="bi bi-arrow-right-short me-1"></i>
+                                <span th:text="${sid}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

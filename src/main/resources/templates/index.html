@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="mb-2">Find Where to Watch</h1>
+            <p class="text-secondary mb-4">Search movies &amp; TV shows across every streaming service.</p>
+            <form class="search-bar d-flex" th:action="@{/search}" method="get">
+                <input class="form-control form-control-lg"
+                       type="search" name="q"
+                       placeholder="Search for a title or person…"
+                       autofocus/>
+                <button class="btn btn-danger btn-lg ms-2 px-4" type="submit">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </form>
+
+            <div th:if="${status}" class="mt-4 text-secondary small">
+                <i class="bi bi-activity me-1"></i>
+                API quota: <span class="text-light" th:text="${status.quotaUsed}"></span>
+                / <span th:text="${status.quota}"></span> used this month
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick links -->
+    <section class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a th:href="@{/browse(types='movie',sortBy='popularity_desc')}"
+                   class="poster-card d-flex align-items-center gap-3 p-4">
+                    <span style="font-size:2.5rem;">🎬</span>
+                    <div>
+                        <div class="fw-bold">Popular Movies</div>
+                        <div class="card-meta">Top movies right now</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a th:href="@{/browse(types='tv_series',sortBy='popularity_desc')}"
+                   class="poster-card d-flex align-items-center gap-3 p-4">
+                    <span style="font-size:2.5rem;">📺</span>
+                    <div>
+                        <div class="fw-bold">Popular TV Series</div>
+                        <div class="card-meta">Trending shows</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a th:href="@{/releases}"
+                   class="poster-card d-flex align-items-center gap-3 p-4">
+                    <span style="font-size:2.5rem;">🆕</span>
+                    <div>
+                        <div class="fw-bold">New Releases</div>
+                        <div class="card-meta">What's new on streaming</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Search by type shortcuts -->
+        <div class="mt-5">
+            <span class="section-title">Browse by Type</span>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a th:href="@{/browse(types='movie')}"           class="btn btn-outline-secondary">Movies</a>
+                <a th:href="@{/browse(types='tv_series')}"       class="btn btn-outline-secondary">TV Series</a>
+                <a th:href="@{/browse(types='tv_miniseries')}"   class="btn btn-outline-secondary">Mini-Series</a>
+                <a th:href="@{/browse(types='tv_special')}"      class="btn btn-outline-secondary">TV Specials</a>
+                <a th:href="@{/browse(types='short_film')}"      class="btn btn-outline-secondary">Short Films</a>
+            </div>
+        </div>
+
+        <!-- Browse by source type -->
+        <div class="mt-4">
+            <span class="section-title">Browse by Availability</span>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a th:href="@{/browse(sourceTypes='sub')}"      class="btn btn-outline-primary">Subscription</a>
+                <a th:href="@{/browse(sourceTypes='free')}"     class="btn btn-outline-danger">Free</a>
+                <a th:href="@{/browse(sourceTypes='rent')}"     class="btn btn-outline-warning">Rent</a>
+                <a th:href="@{/browse(sourceTypes='buy')}"      class="btn btn-outline-success">Buy</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

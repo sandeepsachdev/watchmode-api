@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Browse')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <h2 class="mb-3 fw-bold">Browse Titles</h2>
+
+    <!-- Filter bar -->
+    <form th:action="@{/browse}" method="get" class="filter-bar">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">Type</label>
+                <select class="form-select form-select-sm" name="types">
+                    <option value="">All types</option>
+                    <option value="movie"         th:selected="${types == 'movie'}">Movie</option>
+                    <option value="tv_series"     th:selected="${types == 'tv_series'}">TV Series</option>
+                    <option value="tv_miniseries" th:selected="${types == 'tv_miniseries'}">Mini-Series</option>
+                    <option value="tv_special"    th:selected="${types == 'tv_special'}">TV Special</option>
+                    <option value="short_film"    th:selected="${types == 'short_film'}">Short Film</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">Available on</label>
+                <select class="form-select form-select-sm" name="sourceTypes">
+                    <option value="">Any</option>
+                    <option value="sub"  th:selected="${sourceTypes == 'sub'}">Subscription</option>
+                    <option value="free" th:selected="${sourceTypes == 'free'}">Free</option>
+                    <option value="rent" th:selected="${sourceTypes == 'rent'}">Rent</option>
+                    <option value="buy"  th:selected="${sourceTypes == 'buy'}">Buy</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">Region</label>
+                <select class="form-select form-select-sm" name="regions">
+                    <option value="">All regions</option>
+                    <option value="US" th:selected="${regions == 'US'}">United States</option>
+                    <option value="GB" th:selected="${regions == 'GB'}">United Kingdom</option>
+                    <option value="AU" th:selected="${regions == 'AU'}">Australia</option>
+                    <option value="CA" th:selected="${regions == 'CA'}">Canada</option>
+                    <option value="DE" th:selected="${regions == 'DE'}">Germany</option>
+                    <option value="FR" th:selected="${regions == 'FR'}">France</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-secondary">Genre</label>
+                <select class="form-select form-select-sm" name="genres">
+                    <option value="">All genres</option>
+                    <option th:each="g : ${genreList}"
+                            th:value="${g.id}"
+                            th:text="${g.name}"
+                            th:selected="${genres == g.id.toString()}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">Sort by</label>
+                <select class="form-select form-select-sm" name="sortBy">
+                    <option value="popularity_desc"    th:selected="${sortBy == 'popularity_desc'}">Most Popular</option>
+                    <option value="popularity_asc"     th:selected="${sortBy == 'popularity_asc'}">Least Popular</option>
+                    <option value="release_date_desc"  th:selected="${sortBy == 'release_date_desc'}">Newest First</option>
+                    <option value="release_date_asc"   th:selected="${sortBy == 'release_date_asc'}">Oldest First</option>
+                    <option value="title_asc"          th:selected="${sortBy == 'title_asc'}">A → Z</option>
+                    <option value="title_desc"         th:selected="${sortBy == 'title_desc'}">Z → A</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-danger btn-sm w-100" type="submit">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Error -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- Results -->
+    <div th:if="${titles != null}">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small"
+                  th:text="${titles.totalResults} + ' results — page ' + ${titles.page} + ' of ' + ${titles.totalPages}"></span>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+            <div class="col" th:each="t : ${titles.titles}">
+                <a th:href="@{/titles/{id}(id=${t.id})}" class="poster-card">
+                    <img th:if="${posterMap != null and posterMap[t.id] != null and !posterMap[t.id].isEmpty()}"
+                         th:src="${posterMap[t.id]}" th:alt="${t.title}" loading="lazy"/>
+                    <div th:unless="${posterMap != null and posterMap[t.id] != null and !posterMap[t.id].isEmpty()}"
+                         class="placeholder-poster">
+                        <i class="bi bi-film ph-icon"></i>
+                        <span class="ph-title" th:text="${t.title}"></span>
+                        <span class="ph-year" th:text="${t.year}"></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title" th:text="${t.title}">Title</div>
+                        <div class="card-meta d-flex align-items-center justify-content-between">
+                            <span>
+                                <span th:text="${t.year}"></span>
+                                <span class="ms-1 text-capitalize" th:text="${t.type?.replace('_',' ')}"></span>
+                            </span>
+                            <a th:if="${t.imdbId}"
+                               th:href="'https://www.imdb.com/title/' + ${t.imdbId}"
+                               target="_blank"
+                               class="imdb-mini-badge"
+                               onclick="event.stopPropagation()">IMDb</a>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${titles.totalPages > 1}" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${titles.page <= 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/browse(types=${types},genres=${genres},sourceTypes=${sourceTypes},regions=${regions},sortBy=${sortBy},page=${titles.page - 1})}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link" th:text="'Page ' + ${titles.page} + ' / ' + ${titles.totalPages}"></span>
+                </li>
+                <li class="page-item" th:classappend="${titles.page >= titles.totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/browse(types=${types},genres=${genres},sourceTypes=${sourceTypes},regions=${regions},sortBy=${sortBy},page=${titles.page + 1})}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

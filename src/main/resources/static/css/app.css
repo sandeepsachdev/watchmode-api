@@ -1,0 +1,238 @@
+:root {
+    --accent: #dc3545;
+    --dark-bg: #141414;
+    --card-bg: #1e1e1e;
+    --card-border: #2e2e2e;
+    --text-muted-custom: #888;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main { flex: 1; }
+
+/* ── Poster cards ── */
+.poster-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.poster-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(220,53,69,.35);
+    color: inherit;
+    text-decoration: none;
+}
+.poster-card img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    background: #2a2a2a;
+}
+.poster-card .placeholder-poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: .75rem;
+    text-align: center;
+    gap: .5rem;
+}
+.poster-card .placeholder-poster .ph-icon {
+    font-size: 2rem;
+    color: #444;
+}
+.poster-card .placeholder-poster .ph-title {
+    font-size: .75rem;
+    font-weight: 600;
+    color: #666;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+.poster-card .placeholder-poster .ph-year {
+    font-size: .7rem;
+    color: #444;
+}
+.poster-card .card-body {
+    padding: .75rem;
+}
+.poster-card .card-title {
+    font-size: .9rem;
+    font-weight: 600;
+    margin-bottom: .2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.poster-card .card-meta {
+    font-size: .75rem;
+    color: var(--text-muted-custom);
+}
+
+/* ── IMDb rating badge (detail page) ── */
+.imdb-badge {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .25rem;
+    background: #f5c518;
+    color: #000;
+    border-radius: 6px;
+    padding: .3rem .7rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.imdb-badge .imdb-label {
+    font-size: .65rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    opacity: .8;
+}
+.imdb-badge .imdb-score {
+    font-size: 1.2rem;
+}
+.imdb-badge .imdb-max {
+    font-size: .75rem;
+    opacity: .7;
+}
+
+/* ── IMDb mini badge (browse cards) ── */
+.imdb-mini-badge {
+    display: inline-block;
+    background: #f5c518;
+    color: #000 !important;
+    font-size: .6rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    border-radius: 3px;
+    padding: .1rem .35rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.imdb-mini-badge:hover {
+    background: #e6b800;
+    text-decoration: none;
+}
+
+/* ── Hero ── */
+.hero {
+    background: linear-gradient(135deg, #1a0005 0%, #0d0d0d 60%, #001a0d 100%);
+    padding: 80px 0 60px;
+    border-bottom: 1px solid #2a2a2a;
+}
+.hero h1 { font-size: 3rem; font-weight: 700; }
+.hero .search-bar { max-width: 600px; }
+.hero .search-bar input { border-radius: 30px 0 0 30px; background: #2a2a2a; border: none; color: #fff; }
+.hero .search-bar button { border-radius: 0 30px 30px 0; }
+
+/* ── Section headers ── */
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    padding-bottom: .4rem;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+}
+
+/* ── Source badges ── */
+.source-badge {
+    display: inline-block;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    padding: .3rem .6rem;
+    font-size: .75rem;
+    margin: .2rem;
+}
+.source-badge.type-sub  { border-color: #0d6efd44; color: #6ea8fe; }
+.source-badge.type-rent { border-color: #ffc10744; color: #ffda6a; }
+.source-badge.type-buy  { border-color: #19875444; color: #75b798; }
+.source-badge.type-free { border-color: #dc354544; color: #ea868f; }
+
+/* ── Rating pill ── */
+.rating-pill {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: .15rem .65rem;
+    font-size: .85rem;
+}
+
+/* ── Cast grid ── */
+.cast-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: .75rem;
+    text-align: center;
+    font-size: .8rem;
+}
+.cast-card img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #2a2a2a;
+    margin-bottom: .4rem;
+}
+
+/* ── Misc ── */
+.text-accent { color: var(--accent); }
+.bg-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; }
+.filter-bar { background: var(--card-bg); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.filter-bar select, .filter-bar input {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    color: #e0e0e0;
+}
+.filter-bar select:focus, .filter-bar input:focus {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.25);
+}
+.release-item {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: .75rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.release-item img {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: #2a2a2a;
+}
+.pagination .page-link {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+    color: #e0e0e0;
+}
+.pagination .page-link:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pagination .page-item.active .page-link { background: var(--accent); border-color: var(--accent); }
