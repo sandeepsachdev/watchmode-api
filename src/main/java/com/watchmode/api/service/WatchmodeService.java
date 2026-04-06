@@ -2,15 +2,16 @@ package com.watchmode.api.service;
 
 import com.watchmode.api.config.WatchmodeProperties;
 import com.watchmode.api.model.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
+
 
 @Service
 public class WatchmodeService {
@@ -31,24 +32,32 @@ public class WatchmodeService {
         return get("/status/", StatusResponse.class, b -> b);
     }
 
+    @Cacheable(value = "sources", key = "#regions + ':' + #types")
     public Mono<List<Source>> getSources(String regions, String types) {
-        return getList("/sources/", new ParameterizedTypeReference<>() {}, b -> {
+        Mono<List<Source>> result = getList("/sources/", new ParameterizedTypeReference<List<Source>>() {}, b -> {
             if (regions != null) b = b.queryParam("regions", regions);
             if (types != null)   b = b.queryParam("types", types);
             return b;
         });
+        return result.cache();
     }
 
+    @Cacheable("regions")
     public Mono<List<Region>> getRegions() {
-        return getList("/regions/", new ParameterizedTypeReference<>() {}, b -> b);
+        Mono<List<Region>> result = getList("/regions/", new ParameterizedTypeReference<List<Region>>() {}, b -> b);
+        return result.cache();
     }
 
+    @Cacheable("networks")
     public Mono<List<Network>> getNetworks() {
-        return getList("/networks/", new ParameterizedTypeReference<>() {}, b -> b);
+        Mono<List<Network>> result = getList("/networks/", new ParameterizedTypeReference<List<Network>>() {}, b -> b);
+        return result.cache();
     }
 
+    @Cacheable("genres")
     public Mono<List<Genre>> getGenres() {
-        return getList("/genres/", new ParameterizedTypeReference<>() {}, b -> b);
+        Mono<List<Genre>> result = getList("/genres/", new ParameterizedTypeReference<List<Genre>>() {}, b -> b);
+        return result.cache();
     }
 
     // -------------------------------------------------------------------------
@@ -108,6 +117,7 @@ public class WatchmodeService {
     // Title detail endpoints
     // -------------------------------------------------------------------------
 
+    @Cacheable(value = "titleDetails", key = "#titleId + ':' + #appendToResponse + ':' + #language + ':' + #regions")
     public Mono<TitleDetails> getTitleDetails(String titleId, String appendToResponse,
                                               String language, String regions) {
         return get("/title/" + titleId + "/details/", TitleDetails.class, b -> {
@@ -115,7 +125,7 @@ public class WatchmodeService {
             if (language != null)         b = b.queryParam("language", language);
             if (regions != null)          b = b.queryParam("regions", regions);
             return b;
-        });
+        }).cache();
     }
 
     public Mono<List<TitleSource>> getTitleSources(String titleId, String regions) {
@@ -144,8 +154,9 @@ public class WatchmodeService {
     // Person endpoint
     // -------------------------------------------------------------------------
 
+    @Cacheable(value = "personDetails", key = "#personId")
     public Mono<Person> getPerson(long personId) {
-        return get("/person/" + personId + "/", Person.class, b -> b);
+        return get("/person/" + personId + "/", Person.class, b -> b).cache();
     }
 
     // -------------------------------------------------------------------------
