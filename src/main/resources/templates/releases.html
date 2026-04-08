@@ -87,17 +87,16 @@
                           th:text="${r.type?.replace('_',' ')}"></span>
                     <span th:if="${r.seasonNumber}" class="ms-2">Season <span th:text="${r.seasonNumber}"></span></span>
                 </div>
-                <div class="mt-1">
+                <div class="mt-1 d-flex align-items-center flex-wrap gap-2">
                     <span class="source-badge type-sub" th:if="${r.sourceName}">
                         <i class="bi bi-play-circle me-1"></i>
                         <span th:text="${r.sourceName}"></span>
                         <span th:if="${r.isOriginal}" class="ms-1 badge bg-danger" style="font-size:.65rem;">ORIGINAL</span>
                     </span>
+                    <span class="small text-secondary" th:if="${r.sourceReleaseDate}">
+                        <i class="bi bi-calendar3 me-1"></i><span th:text="${r.sourceReleaseDate}"></span>
+                    </span>
                 </div>
-            </div>
-            <div class="text-end flex-shrink-0">
-                <div class="small text-secondary">Release date</div>
-                <div class="fw-semibold" th:text="${r.sourceReleaseDate}"></div>
             </div>
         </div>
     </div>
